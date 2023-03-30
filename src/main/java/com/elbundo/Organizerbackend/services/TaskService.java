@@ -2,7 +2,6 @@ package com.elbundo.Organizerbackend.services;
 
 import com.elbundo.Organizerbackend.dto.TypeTasks;
 import com.elbundo.Organizerbackend.exceptions.AddTaskException;
-import com.elbundo.Organizerbackend.exceptions.TaskNotExistsException;
 import com.elbundo.Organizerbackend.models.Task;
 import com.elbundo.Organizerbackend.models.User;
 

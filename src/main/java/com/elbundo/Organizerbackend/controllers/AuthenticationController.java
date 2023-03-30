@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(value = "${frontend.endpoint}", allowCredentials = "true")
+@CrossOrigin(origins = {"${frontend.endpoint}"}, allowCredentials = "true")
 public class AuthenticationController {
 
     private final AuthenticationService service;
