@@ -2,7 +2,7 @@ package com.elbundo.Organizerbackend.auth;
 
 import com.elbundo.Organizerbackend.models.User;
 import com.elbundo.Organizerbackend.repositories.UserRepository;
-import com.elbundo.Organizerbackend.services.JwtService;
+import com.elbundo.Organizerbackend.services.Impl.JwtServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -26,21 +25,20 @@ import java.util.Optional;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
-    private final JwtService jwtService;
-
+    private final JwtServiceImpl jwtService;
     private final UserRepository userRepo;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        //TODO Рефакторить
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            String username = jwtService.extractUsername(token);
+            String username = jwtService.extractLogin(token);
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if(jwtService.isTokenValid(token, userDetails)) {
-                    Optional<User> userOpt = userRepo.findByUsername(username);
+                    Optional<User> userOpt = userRepo.findByLogin(username);
                     if(userOpt.isPresent()) {
                         User user = userOpt.get();
                         userRepo.save(user);

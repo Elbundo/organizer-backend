@@ -1,6 +1,5 @@
 package com.elbundo.Organizerbackend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,15 +11,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task {
+public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    private String text;
-    private Boolean status;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    private String refreshToken;
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     private User user;
 }

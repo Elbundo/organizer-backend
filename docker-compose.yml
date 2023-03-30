@@ -1,0 +1,33 @@
+version: "3.3"
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_DATABASE=$MYSQL_DB
+      - MYSQL_ROOT_PASSWORD=$MYSQL_PASS
+    ports:
+      - ${MYSQL_LOCAL_PORT}:${MYSQL_DOCKER_PORT}
+    volumes:
+      - db:/var/lib/mysql
+  backend:
+    depends_on:
+      - mysqldb
+    image: organizer-backend:latest
+    restart: on-failure
+    env_file: ./.env
+    ports:
+      - ${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}
+    environment:
+      SPRING_APPLICATION_JSON: '{
+            "spring.profiles.active" : "prod"
+          }'
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+
+volumes:
+  db:

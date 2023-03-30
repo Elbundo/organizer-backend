@@ -10,7 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends CrudRepository<Task, Long> {
-    List<Task> getAllTasksByUser(User user);
-    Optional<Task> findByIdAndUser(Long id, User user);
+    List<Task> findAllByUser(User user);
+    List<Task> findByUserAndStatus(User user, boolean status);
     void deleteByIdAndUser(Long id, User user);
+    long countByUser(User user);
 }

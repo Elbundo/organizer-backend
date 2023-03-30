@@ -2,26 +2,13 @@ package com.elbundo.Organizerbackend.services;
 
 import com.elbundo.Organizerbackend.dto.AuthenticationRequest;
 import com.elbundo.Organizerbackend.dto.AuthenticationResponse;
-import com.elbundo.Organizerbackend.repositories.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.stereotype.Service;
+import com.elbundo.Organizerbackend.dto.TokenPair;
+import com.elbundo.Organizerbackend.models.User;
+import org.springframework.security.core.AuthenticationException;
 
-@Service
-@RequiredArgsConstructor
-public class AuthenticationService {
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
-    private final UserRepository repository;
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-        var user  = repository.findByUsername(request.getUsername()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .build();
-    }
+public interface AuthenticationService {
+    TokenPair authenticate(AuthenticationRequest request);
+    TokenPair refresh(String refreshToken) throws AuthenticationException;
+
+    void logout(User user);
 }

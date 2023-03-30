@@ -1,5 +1,6 @@
-package com.elbundo.Organizerbackend.services;
+package com.elbundo.Organizerbackend.services.Impl;
 
+import com.elbundo.Organizerbackend.dto.TokenPair;
 import com.elbundo.Organizerbackend.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -17,13 +18,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public class JwtServiceImpl {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
-    public String extractUsername(String token) {
+    public String extractLogin(String token) {
         final Claims claims = extractAllClaims(token);
-        return claims.get("username", String.class);
+        return claims.get("login", String.class);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -32,11 +33,11 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+        final String username = extractLogin(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -44,24 +45,37 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public String generateToken(User user) {
+    public String generateToken(User user, long lifetime) {
         Map<String, Object> map = new HashMap<>();
-        map.put("username", user.getUsername());
+        map.put("login", user.getUsername());
         map.put("name", user.getName());
         map.put("role", user.getRole());
-        return generateToken(map, user);
+        return generateToken(map, user, lifetime);
+    }
+
+    public String generateAccessToken(User user) {
+        return generateToken(user, 1000 * 60 * 30);
+    }
+
+    public String generateRefreshToken(User user) {
+        return generateToken(user, 1000 * 60 * 60 * 30);
+    }
+
+    public TokenPair generateTokens(User user) {
+        return new TokenPair(generateAccessToken(user), generateRefreshToken(user));
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            User user
+            User user,
+            long lifetime
     ) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60  * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + lifetime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS512)
                 .compact();
     }

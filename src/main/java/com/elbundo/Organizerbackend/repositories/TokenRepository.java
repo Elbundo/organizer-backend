@@ -1,17 +1,14 @@
 package com.elbundo.Organizerbackend.repositories;
 
+import com.elbundo.Organizerbackend.models.RefreshToken;
 import com.elbundo.Organizerbackend.models.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, Long> {
-    List<User> findAll();
-    Optional<User> findByLogin(String login);
-
-    boolean existsByLogin(String login);
-    //List<User> findAll();
+public interface TokenRepository extends CrudRepository<RefreshToken, Long> {
+    Optional<RefreshToken> getByUser(User user);
+    void deleteByUser(User user);
 }
