@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public NewUserResponse addUser(User user) throws Exception {
-        if(!userRepository.existsByLogin(user.getUsername()))
+        if(userRepository.existsByLogin(user.getUsername()))
             throw new LoginAlreadyExistException("User with same login already exists");
         String password = generatePassword();
         User newUser = User.builder()
